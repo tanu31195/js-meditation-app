@@ -11,17 +11,35 @@ const app = () => {
     const video = document.querySelector(".vid-container video");
     const sound = document.querySelectorAll(".sound-picker button");
     const timeDisplay = document.querySelector(".time-display");
+    const timeSelect = document.querySelectorAll(".time-select button");
     const outlineLength = outline.getTotalLength();
-    console.log(outlineLength);
+    const sounds = document.querySelectorAll(".sound-picker button");
 
     let fakeDuration = 600;
 
     outline.style.strokeDasharray = outlineLength;
     outline.style.strokeDashoffset = outlineLength;
 
+    //Pick sounds
+    sounds.forEach(sound => {
+        sound.addEventListener('click', function () {
+            song.src = this.getAttribute('data-sound');
+            video.src = this.getAttribute('data-video');
+            checkPlaying(song);
+        });
+    });
 
+    //Play sound
     play.addEventListener("click", () => {
         checkPlaying(song);
+    });
+
+    //Select sound
+    timeSelect.forEach(option => {
+        option.addEventListener('click', function () {
+            fakeDuration = this.getAttribute("data-time");
+            timeDisplay.textContent = `${Math.floor(fakeDuration / 60)} : ${Math.floor(fakeDuration % 60)}`
+        })
     });
 
     //Function to stop and play sounds and videos
@@ -47,7 +65,22 @@ const app = () => {
         let progress = outlineLength - (currentTime / fakeDuration) * outlineLength;
         outline.style.strokeDashoffset = progress;
 
+        if (minutes < 10) {
+            minutes = "0" + minutes;
+        }
+        if (seconds < 10) {
+            seconds = "0" + seconds;
+        }
+
+        //Animating time text
         timeDisplay.textContent = `${minutes}:${seconds}`;
+
+        if (currentTime >= fakeDuration) {
+            song.pause();
+            song.currentTime = 0;
+            play.src = './svg/play.svg';
+            video.pause();
+        }
     };
 
 };
